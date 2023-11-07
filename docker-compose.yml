@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  api:
+    build: .
+    restart: always
+    environment:
+      DATABASE_CONNECTION: ${DATABASE_CONNECTION_DOCKER}
+    ports:
+      - "8080:80"
+  db:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    restart: always
+    ports:
+      - "${PORT}:1433"
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_PID: Express
+      MSSQL_SA_PASSWORD: ${MSSQL_PASSWORD}
+      MSSQL_DATABASE: ${MSSQL_DATABASE}
+    volumes:
+      - uhc-database-vol:/var/opt/mssql
+volumes:
+  uhc-database-vol:
