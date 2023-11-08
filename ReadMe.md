@@ -1,17 +1,19 @@
 # Required
 
 ## .env
-- Make sure to have a .env file that mimics the .env-config file. Add data where necessary.
+- Make sure to have a ``.env`` file that mimics the ``.env-config`` file. Add data where necessary.
+- Ask Owner what data should be in here if you have no idea.
 
 ## Docker
 - Make sure you have Docker installed
 
 ## .NET 7
-- Make sure you are running the application using the .NET7 instance.
+- Make sure you are running the application using the ``.NET7`` instance.
+- The docker container should take care of this, but if you want to run it locally you will need it.
 
 # QuickStart
 
-- Run compose-full.sh using a linux kernel
+- Run ``compose-full.sh`` using a linux kernel
 
 Note: Database might be empty.
 # Detailed help

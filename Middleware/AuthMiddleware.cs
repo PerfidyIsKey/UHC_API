@@ -30,9 +30,7 @@ public class AuthMiddleware
             if (context.Request.Method != HttpMethod.Get.Method)
             {
                 string? givenPassword = context.Request.Headers["AUTH"];
-                Console.WriteLine(_password);
                 
-
                 var remoteIp = context.Connection.RemoteIpAddress;
                 _logger.LogDebug("Request from Remote IP address: {RemoteIp}", remoteIp);
 
