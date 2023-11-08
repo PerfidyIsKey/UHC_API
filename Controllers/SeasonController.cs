@@ -16,7 +16,6 @@ public class SeasonController : ControllerBase
     {
         var query = _context.Seasons.Include(season => season.Connections)
             .ThenInclude(connection => connection.Player)
-            .Include(season => season.Connections)
             .AsQueryable();
         return query.ToList();
     }

@@ -1,3 +1,5 @@
+using UHC_API.DTOs;
+
 namespace UHC_API.Controllers
 {
     [ApiController]
@@ -13,67 +15,68 @@ namespace UHC_API.Controllers
 
         [HttpGet(Name = "GetPlayers")]
         [Route("")]
-        public List<Player> GetAll()
+        public async Task<IEnumerable<PlayerDto>?> GetAll()
         {
             var query = CreateQuery();
-            return query.ToList();
+            var result = await query.ToListAsync();
+            return PlayersToDto(result);
         }
         
         [HttpGet]
         [Route("{id}")]
-        public ObjectResult Get(int id)
+        public async Task<ObjectResult> Get(int id)
         {
-            var query = CreateQuery();
+            var query = CreateQueryExtended();
             var player = query.SingleOrDefault(player => player.Id == id);
             if (player == null) return NotFound(null);
-            return Ok(player);
+            return Ok(await PlayerToDto(player));
         }
 
         [HttpPost(Name = "PostPlayer")]
         [Route("")]
-        public ObjectResult Post(Player player)
+        public async Task<ObjectResult> Post(Player player)
         {
             if (player.Name == null || player.DiscordId == null) return BadRequest(player);
             var newPlayer = CreateNewPlayer(player);
 
-            _context.Players.AddAsync(newPlayer);
-            _context.SaveChangesAsync();
+            await _context.Players.AddAsync(newPlayer);
+            await _context.SaveChangesAsync();
             return Ok(newPlayer);
         }
         
         [HttpPost]
         [Route("many")]
-        public ObjectResult PostMany(List<Player> players)
+        public async Task<ObjectResult> PostMany(List<Player> players)
         {
             var newPlayers = players.Select(CreateNewPlayer).ToList();
             foreach (var newPlayer in newPlayers)
             {
-                _context.Players.AddAsync(newPlayer);
+                await _context.Players.AddAsync(newPlayer);
             }
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return Ok(newPlayers);
         }
 
         [HttpPost]
         [Route("update")]
-        public ObjectResult Update(Player player)
+        public async Task<ObjectResult> Update(Player player)
         {
             var updatedPlayer = UpdatePlayer(player);
             if (updatedPlayer == null) return NotFound(null);
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return Ok(updatedPlayer);
         }
 
         [HttpPost]
         [Route("updates")]
-        public ObjectResult UpdateMany(List<Player> players)
+        public async Task<ObjectResult> UpdateMany(List<Player> players)
         {
             foreach (var player in players)
             {
                 UpdatePlayer(player);
                 
             }
-            _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return Ok(players);
         }
 
@@ -95,8 +98,13 @@ namespace UHC_API.Controllers
 
         private IQueryable<Player> CreateQuery() {
             var query = _context.Players.Include(player => player.Connections)
+                .AsQueryable();
+            return query;
+        }
+        
+        private IQueryable<Player> CreateQueryExtended() {
+            var query = _context.Players.Include(player => player.Connections)
                 .ThenInclude(connection => connection.Season)
-                .Include(player => player.Connections)
                 .AsQueryable();
             return query;
         }
@@ -110,5 +118,26 @@ namespace UHC_API.Controllers
             };
             return newPlayer;
         }
+        
+        private IEnumerable<PlayerDto>? PlayersToDto(List<Player> players)
+        {
+            return players?.Select((player) => PlayerToDto(player).Result);
+        }
+
+        private async Task<PlayerDto> PlayerToDto(Player player)
+        {
+            var dto = new PlayerDto()
+            {
+                Id = player.Id,
+                Name = player.Name,
+                DiscordId = player.DiscordId,
+                Rank = player.Rank,
+                TimesPlayed = player.Connections.Count,
+                TimesWon = player.Connections.Count(connection => connection.HasWon == true),
+                TimesBeenTraitor = player.Connections.Count(connection => connection.IsTraitor == true)
+            };
+            return dto;
+        }
+
     }
 }
