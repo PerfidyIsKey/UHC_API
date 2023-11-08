@@ -5,6 +5,8 @@ services:
     restart: always
     environment:
       DATABASE_CONNECTION: ${DATABASE_CONNECTION_DOCKER}
+      WHITE_LISTED_IPS: ${WHITE_LISTED_IPS}
+      PASSWORD: ${PASSWORD}
     ports:
       - "8080:80"
   db:
