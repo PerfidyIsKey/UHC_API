@@ -8,20 +8,36 @@ public static class TeamWeigher
     {
         var weighedRank = WeighRank(teams1, teams2);
         var weighedTimesPlayedTogether = WeighTimesPlayedTogether(teams1, teams2);
-        if (weighedRank && weighedTimesPlayedTogether) return teams1;
-        if (!weighedRank && !weighedTimesPlayedTogether)return teams2;
         
-        return weighedRank ? teams1 : teams2;
+        if (weighedRank.result && weighedTimesPlayedTogether.result) return teams1;
+        if (!weighedRank.result && !weighedTimesPlayedTogether.result) return teams2;
+        
+        if (weighedRank.weight > weighedTimesPlayedTogether.weight)
+        {
+            return weighedRank.result ? teams1 : teams2;
+        }
+        return weighedTimesPlayedTogether.result ? teams1 : teams2;
     }
 
-    private static bool WeighRank(IReadOnlyCollection<Team> teams1, IReadOnlyCollection<Team> teams2)
+    private static Weighable WeighRank(IReadOnlyCollection<Team> teams1, IReadOnlyCollection<Team> teams2)
     {
-        return DiffCalculator(teams1) <= DiffCalculator(teams2);
+        var weight = DiffCalculator(teams1) - DiffCalculator(teams2);
+        return CreateWeighable(weight);
     }
 
-    private static bool WeighTimesPlayedTogether(IEnumerable<Team> teams1, IEnumerable<Team> teams2)
+    private static Weighable WeighTimesPlayedTogether(IEnumerable<Team> teams1, IEnumerable<Team> teams2)
     {
-        return HighestConnection(teams1) <= HighestConnection(teams2);
+        var weight = HighestConnection(teams1) - HighestConnection(teams2);
+        return CreateWeighable(weight, 3);
+    }
+
+    private static Weighable CreateWeighable(double weight, int multiplier = 1)
+    {
+        return new Weighable
+        {
+            result = weight <= 0,
+            weight = weight < 0 ? weight * -multiplier : weight * multiplier
+        };
     }
 
     private static int HighestConnection(IEnumerable<Team> teams)
@@ -31,7 +47,8 @@ public static class TeamWeigher
 
     private static int HighestConnection(Team team)
     {
-        return team.Players.Max(player => Assessor.HighestTimesPlayedWithAnyone(player, GetListWithoutPlayer(player, team.Players)));
+        return team.Players.Max(player =>
+            Assessor.HighestTimesPlayedWithAnyone(player, GetListWithoutPlayer(player, team.Players)));
     }
 
     private static IEnumerable<Player> GetListWithoutPlayer(Player player, IEnumerable<Player> allPlayers)

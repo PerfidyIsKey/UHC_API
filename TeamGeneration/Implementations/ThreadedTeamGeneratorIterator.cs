@@ -28,7 +28,7 @@ public class ThreadedTeamGeneratorIterator : ITeamGeneratorIterator
         return results[0];
     }
 
-    private static List<List<Team>> ThreadResultCombiner(List<List<Team>> teamsList)
+    private static List<List<Team>> ThreadResultCombiner(IReadOnlyList<List<Team>> teamsList)
     {
         var results = new List<List<Team>>();
         for (var i = 0; i < teamsList.Count/2; i++)

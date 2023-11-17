@@ -1,4 +1,5 @@
 using Microsoft.IdentityModel.Tokens;
+using UHC_API.Constants;
 using UHC_API.HelperClasses;
 using UHC_API.TeamGeneration.Interfaces;
 
@@ -11,6 +12,7 @@ public class BruteForceTeamGenerator : ITeamGenerator
     private readonly int _averagePlayerRank;
     private readonly int _teamSize;
     private readonly int _teamAmount;
+    private readonly List<string> _nameList;
 
     public BruteForceTeamGenerator(ApplicationDbContext context, ITeamInitialisationPicker teamInitialisationPicker)
     {
@@ -21,8 +23,7 @@ public class BruteForceTeamGenerator : ITeamGenerator
         _averagePlayerRank = (int) query.Average(player => player.Rank ?? 0);
         _teamSize = teamInitialisationPicker.PickSize();
         _teamAmount = teamInitialisationPicker.PickAmount();
-
-        _nameList = _nameList.OrderBy(x => Random.Shared.Next()).ToList();
+        _nameList = NamingConstants.NameList.OrderBy(x => Random.Shared.Next()).ToList();
     }
 
     public List<Team> GenerateTeams()
@@ -52,45 +53,6 @@ public class BruteForceTeamGenerator : ITeamGenerator
         return teams;
     }
 
-    private readonly List<string> _colorNameList = new ()
-    {
-        "Yellow", "Blue", "Red", "Purple", "Green", "Pink", "Black", "Orange", "Gray", "Aqua", "Dark_Red", "Dark_Blue",
-        "Dark_Aqua"
-    };
-
-    private readonly List<string> _nameList = new ()
-    {
-        "Buffalo's",
-        "Robots",
-        "Veterans",
-        "Players",
-        "Barons",
-        "Cats",
-        "Dogs",
-        "Lions",
-        "Trains",
-        "Friends",
-        "Bubbles",
-        "Programmers",
-        "Fingers",
-        "Noobs",
-        "Moms",
-        "Husbands",
-        "Kids",
-        "Singers",
-        "Archers",
-        "Fighters",
-        "Tanks",
-        "Therapists",
-        "Politicians",
-        "Farmers",
-        "Brotherhood",
-        "Gang",
-        "Mice",
-        "Forks",
-        "Astronauts"
-    };
-
     private Team? GenerateNewTeam(int teamNumber, List<Player> players)
     {
         var playersInTeam = GeneratePlayerListForTeam(players);
@@ -99,7 +61,7 @@ public class BruteForceTeamGenerator : ITeamGenerator
         {
             Players = playersInTeam,
             Color = (Color)teamNumber,
-            Name = _colorNameList[teamNumber] + " " + _nameList[teamNumber],
+            Name = NamingConstants.ColorNameList[teamNumber] + " " + _nameList[teamNumber],
             AverageRank = playersInTeam.Sum(player => player.Rank ?? 0) / _teamSize,
             Size = playersInTeam.Count,
             TeamSize = _teamSize
