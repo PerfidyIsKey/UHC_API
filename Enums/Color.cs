@@ -2,20 +2,21 @@
 
 public enum Color
 {
-    DarkRed,
-    Red,
-    Gold,
     Yellow,
-    DarkGreen,
-    Green,
-    Aqua,
-    DarkAqua,
-    DarkBlue,
     Blue,
-    LightPurple,
+    Red,
     DarkPurple,
-    White,
+    DarkGreen,
+    LightPurple,
+    Black,
+    Gold,
     Gray,
-    DarkGray,
-    Black
+    Aqua,
+    DarkRed,
+    DarkBlue,
+    DarkAqua,
+    
+    Green,
+    White,
+    DarkGray
 }

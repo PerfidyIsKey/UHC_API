@@ -29,6 +29,26 @@ namespace UHC_API.Controllers
             return query.ToList();
         }
         
+        [HttpGet]
+        [Route("{seasonId:int}/{playerId:int}")]
+        public List<Connection> GetByIDs(int? seasonId, int? playerId)
+        {
+            var query = _context.Connections
+                .AsQueryable();
+            if (seasonId != null)
+            {
+                query = query.Where(connection => connection.SeasonId == seasonId)
+                    .Include(connection => connection.Player);
+            } 
+            if (playerId != null)
+            {
+                query = query.Where(connection => connection.PlayerId == playerId)
+                    .Include(connection => connection.Season);
+            }
+
+            return query.ToList();
+        }
+        
         [HttpPost]
         [Route("")]
         public ObjectResult Post(Connection connection)

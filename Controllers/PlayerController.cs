@@ -23,7 +23,7 @@ namespace UHC_API.Controllers
         }
         
         [HttpGet]
-        [Route("{id}")]
+        [Route("{id:int}")]
         public async Task<ObjectResult> Get(int id)
         {
             var query = CreateQueryExtended();
