@@ -1,5 +1,6 @@
 using UHC_API.DTOs;
 using UHC_API.HelperClasses;
+using UHC_API.TeamGeneration;
 using UHC_API.TeamGeneration.Implementations;
 using UHC_API.TeamGeneration.Interfaces;
 
@@ -48,10 +49,10 @@ namespace UHC_API.Controllers
 
             ITeamGenerator teamGenerator = new BruteForceTeamGenerator(_context, teamInitialisationPicker);
             ITeamGeneratorIterator iterator = new ThreadedTeamGeneratorIterator();
-            return iterator.Iterate(teamGenerator, 1000000);
+            return iterator.Iterate(teamGenerator, 10000);
         }
 
-        private static List<TeamDto> ConvertTeamsToDtOs(List<Team> teams)
+        private static List<TeamDto> ConvertTeamsToDtOs(IReadOnlyCollection<Team> teams)
         {
             var averageTeamRank = (int)teams.Average(team => team.AverageRank);
 
@@ -64,10 +65,27 @@ namespace UHC_API.Controllers
             {
                 Color = team.Color,
                 Name = team.Name,
-                Players = team.Players,
+                Players = ConvertPlayersToDto(team.Players, team),
                 AverageRank = team.AverageRank,
                 Size = team.Size,
                 Diff = team.AverageRank - averageTeamRank
+            };
+        }
+
+        private static List<GeneratorPlayerDto> ConvertPlayersToDto(IEnumerable<Player> players, Team team)
+        {
+            return players.Select(player => ConvertPlayerToDto(player, team)).ToList();
+        }
+
+        private static GeneratorPlayerDto ConvertPlayerToDto(Player player, Team team)
+        {
+            return new GeneratorPlayerDto()
+            {
+                Id = player.Id,
+                Name = player.Name,
+                Rank = player.Rank,
+                HighestConnectionInTeam =
+                    Assessor.HighestTimesPlayedWithAnyone(player, Assessor.GetListWithoutPlayer(player, team.Players))
             };
         }
     }

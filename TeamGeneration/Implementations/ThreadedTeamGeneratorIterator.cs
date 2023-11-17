@@ -39,22 +39,6 @@ public class ThreadedTeamGeneratorIterator : ITeamGeneratorIterator
         return results;
     }
 
-    private static List<List<Team>> FullThreadHandler(List<List<Team>> teamsList)
-    {
-        var threads = new List<Thread>();
-        var results = new List<List<Team>>();
-        for (var i = 0; i < teamsList.Count/2; i++)
-        {
-            var thread = new Thread(() =>
-            {
-                results.Add(TeamWeigher.Weigh(teamsList[i], teamsList[teamsList.Count-1-i]));
-            });
-            threads.Add(thread);
-        }
-        ThreadExecutor(threads);
-        return results;
-    }
-
     private static void ThreadExecutor(List<Thread> threads)
     {
         foreach (var thread in threads)

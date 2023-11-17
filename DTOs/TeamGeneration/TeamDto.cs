@@ -8,5 +8,5 @@ public class TeamDto
     
     public int Diff { get; set; }
     public int AverageRank { get; set; }
-    public List<Player> Players { get; set; }
+    public List<GeneratorPlayerDto> Players { get; set; }
 }

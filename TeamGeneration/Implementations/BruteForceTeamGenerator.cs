@@ -16,6 +16,7 @@ public class BruteForceTeamGenerator : ITeamGenerator
     {
         _context = context;
         var query = _context.Players.Where(player => player.Connections.Any(connection => connection.SeasonId == teamInitialisationPicker.GetSeasonId()));
+        query = query.Include(player => player.Connections);
         _players = query.ToList();
         _averagePlayerRank = (int) query.Average(player => player.Rank ?? 0);
         _teamSize = teamInitialisationPicker.PickSize();
@@ -125,7 +126,7 @@ public class BruteForceTeamGenerator : ITeamGenerator
 
     private Player PickTeamMate(List<Player> playersToMatch, List<Player> availablePlayers)
     {
-        ITeamMatePicker picker = new BalancedTeamMatePicker(_averagePlayerRank, _teamAmount);
+        ITeamMatePicker picker = new BalancedTeamMatePicker(_averagePlayerRank, _teamAmount, _players);
         return picker.PickTeamMate(playersToMatch, availablePlayers);
     }
 }
